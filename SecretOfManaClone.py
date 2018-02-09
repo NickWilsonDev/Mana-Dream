@@ -1,5 +1,6 @@
 # SecretOfManaClone.py
 import pygame
+import time
 
 KEY_UP = 273
 KEY_DOWN = 274
@@ -7,9 +8,43 @@ KEY_LEFT = 276
 KEY_RIGHT = 275
 
 
-def attack_animation(direction):
-    pass
+def load_attack_animation(direction):
+    images = []
+    if direction == "down":
+        images.append(pygame.image.load("./art/dk_down_attack1.png").convert_alpha())
+        images.append(pygame.image.load("./art/dk_down_attack2.png").convert_alpha())
+        images.append(pygame.image.load("./art/dk_down_attack3.png").convert_alpha())
+        images.append(pygame.image.load("./art/dk_down_attack4.png").convert_alpha())
+        images.append(pygame.image.load("./art/dk_down_attack5.png").convert_alpha())
+        images.append(pygame.image.load("./art/dk_down_attack6.png").convert_alpha())
+        images.append(pygame.image.load("./art/dk_down_attack7.png").convert_alpha())
+        images.append(pygame.image.load("./art/dk_down_attack8.png").convert_alpha())
+        images.append(pygame.image.load("./art/dk_down_attack9.png").convert_alpha())
+        images.append(pygame.image.load("./art/dk_down_attack10.png").convert_alpha())
 
+    elif direction == "up":
+        images.append(pygame.image.load("./art/dk_up_attack1.png").convert_alpha())
+        images.append(pygame.image.load("./art/dk_up_attack2.png").convert_alpha())
+        images.append(pygame.image.load("./art/dk_up_attack3.png").convert_alpha())
+        images.append(pygame.image.load("./art/dk_up_attack4.png").convert_alpha())
+        images.append(pygame.image.load("./art/dk_up_attack5.png").convert_alpha())
+        images.append(pygame.image.load("./art/dk_up_attack6.png").convert_alpha())
+        images.append(pygame.image.load("./art/dk_up_attack7.png").convert_alpha())
+        images.append(pygame.image.load("./art/dk_up_attack8.png").convert_alpha())
+        images.append(pygame.image.load("./art/dk_up_attack9.png").convert_alpha())
+        images.append(pygame.image.load("./art/dk_up_attack10.png").convert_alpha())
+
+    return images
+
+def attack_animation(direction, interval):
+
+    images = load_attack_animation(direction)
+
+    print "# of images %d" % (len(images))
+    if interval > len(images):
+        print images
+        interval = 0
+    return images[interval]
 
 def main():
     width = 1500
@@ -32,11 +67,13 @@ def main():
     user_control = False
     loading_screen = True
     character_facing = "down"
+    character_picture = ''
 
     clock = pygame.time.Clock()
 
     # Game initialization
-
+    interval = 0
+    character_attack = False
     pygame.mixer.music.play(-1, 0.0)
     stop_game = False
     while not stop_game:
@@ -66,6 +103,7 @@ def main():
         elif keys[pygame.K_DOWN]:
             character_y = character_y + 5
             character_facing = "down"
+            player_character_picture = character_picture
 
         elif keys[pygame.K_LEFT]:
             character_x = character_x - 5
@@ -76,8 +114,15 @@ def main():
             character_facing = "right"
 
         elif keys[pygame.K_SPACE]:
-            attack_animation(character_facing)
-
+            #global interval
+            character_attack = True
+            #player_character_picture = attack_animation(character_facing, character_x, character_y, screen, interval)
+            #if interval > 8:
+            #    interval = 0
+            #else:
+            #    interval += 1
+            
+        
         for event in pygame.event.get():
 
             # Event handling
@@ -90,8 +135,8 @@ def main():
                 user_control = True
                 pygame.mixer.music.load("./music/Prophecy.mp3")
                 pygame.mixer.music.play(-1, 0.0)
-                player_character_picture = pygame.image.load("./art/DarkKnight.png").convert_alpha()
-
+                player_character_picture = pygame.image.load("./art/dk_down.png").convert_alpha()
+                character_picture = player_character_picture
             
             if event.type == pygame.QUIT:
                 stop_game = True
@@ -102,7 +147,13 @@ def main():
         screen.blit(picture, (0, 0))
         if user_control:
             screen.blit(player_character_picture, (character_x, character_y))
-            pass
+        if character_attack:
+            interval = (interval + 1) % 10
+            print "interval %d " % interval
+            screen.blit(attack_animation(character_facing, interval), (character_x, character_y))
+            if interval >= 9:
+                interval = 0
+                character_attack = False
         # Game display
 
 
