@@ -1,6 +1,7 @@
 # SecretOfManaClone.py
 import pygame
 import time
+from itertools import cycle
 
 KEY_UP = 273
 KEY_DOWN = 274
@@ -61,9 +62,6 @@ def load_attack_animation(direction):
 
 def attack_animation(direction, interval):
     images = load_attack_animation(direction)
-    #if interval > len(images):
-    #    print images
-    #    interval = 1
     return images[interval]
 
 def load_walk_animation(direction):
@@ -95,9 +93,6 @@ def load_walk_animation(direction):
 
 def walk_animation(direction, interval):
     images = load_walk_animation(direction)
-    #if interval > len(images):
-    #    interval = 1
-
     return images[interval]
 
 def get_standing_direction(direction):
@@ -110,6 +105,15 @@ def get_standing_direction(direction):
     elif direction == "left":
         image = pygame.image.load("./art/dk_left.png").convert_alpha()
     return image
+
+def display_menu():
+    # list = cycle(images) to cycle through circular list
+    images = []
+    images.append(pygame.image.load("./art/undine.png").convert_alpha())
+    images.append(pygame.image.load("./art/shade.png").convert_alpha())
+    images.append(pygame.image.load("./art/sylphid.png").convert_alpha())
+    images.append(pygame.image.load("./art/salamando.png").convert_alpha())
+    return images
 
 def main():
     screen_width = 1500
@@ -137,11 +141,14 @@ def main():
     clock = pygame.time.Clock()
 
     start_frame = time.time()
+    background_x = 0
+    background_y = 0
     # Game initialization
     interval = 0
     character_facing = "down"
     character_walk = False
     character_attack = False
+    item_menu = False
     pygame.mixer.music.play(-1, 0.0)
     stop_game = False
     while not stop_game:
@@ -164,23 +171,22 @@ def main():
             character_y = character_y + 3
             character_x = character_x + 3
 
-        elif keys[pygame.K_UP]:
+        elif keys[pygame.K_UP] and not item_menu:
             character_y = character_y - 5
             character_facing = "up"
             character_walk = True
 
-        elif keys[pygame.K_DOWN]:
+        elif keys[pygame.K_DOWN] and not item_menu:
             character_y = character_y + 5
             character_facing = "down"
             character_walk = True
-            #player_character_picture = character_picture
 
-        elif keys[pygame.K_LEFT]:
+        elif keys[pygame.K_LEFT] and not item_menu:
             character_x = character_x - 5
             character_facing = "left"
             character_walk = True
 
-        elif keys[pygame.K_RIGHT]:
+        elif keys[pygame.K_RIGHT] and not item_menu:
             character_x = character_x + 5
             character_facing = "right"
             character_walk = True
@@ -188,6 +194,10 @@ def main():
         elif keys[pygame.K_SPACE]:
             character_attack = True
 
+        elif keys[pygame.K_i]:
+            item_menu = True
+
+            print "Items.....%s" % str(item_menu)
 
         for event in pygame.event.get():
 
@@ -210,7 +220,7 @@ def main():
         # Game logic
 
         # Draw background
-        screen.blit(picture, (0, 0))
+        screen.blit(picture, (background_x, background_y))
         #screen.blit(picture, (-200, -300))
         if user_control:
             #screen.blit(player_character_picture, (character_x, character_y))
@@ -229,7 +239,6 @@ def main():
         if character_walk:
             print "Character(x, y) (%d, %d)" % (character_x, character_y)
             
-            #interval = (interval + 1) % 4
             noi = 4
             frames_per_sec = 10
             interval = int((time.time() - start_frame) * frames_per_sec % noi)
@@ -238,10 +247,27 @@ def main():
                 interval = 0
                 character_walk = False
                 screen.blit(get_standing_direction(character_facing), (character_x, character_y))
+        if item_menu:
+            images = display_menu()
+            screen.blit(images[0], (character_x, character_y - 20))
+            screen.blit(images[1], (character_x + 20, character_y))
+            screen.blit(images[2], (character_x, character_y + 20))
+            screen.blit(images[3], (character_x - 20, character_y))
+
         # Game display
         if character_x >= 1400:
+            background_x = background_x - character_x
             character_x = 50
-            screen.blit(picture, (character_x - screen_width, screen_height))
+        if character_y >= 1000:
+            background_y = background_y - character_y
+            character_y = 50
+
+        if character_x < 10:
+            background_x = background_x + 1400
+            character_x = 50
+        if character_y < 10:
+            background_y = background_y + 900
+            character_y = 50
 
         pygame.display.update()
         clock.tick(60)
