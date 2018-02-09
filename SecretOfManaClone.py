@@ -60,19 +60,60 @@ def load_attack_animation(direction):
     return images
 
 def attack_animation(direction, interval):
-    print "direction :: %s" % direction
-
     images = load_attack_animation(direction)
-
-    print "# of images %d" % (len(images))
-    if interval > len(images):
-        print images
-        interval = 1
+    #if interval > len(images):
+    #    print images
+    #    interval = 1
     return images[interval]
 
+def load_walk_animation(direction):
+    images = []
+    if direction == "up":
+        images.append(pygame.image.load("./art/dk_up_walk1.png").convert_alpha())
+        images.append(pygame.image.load("./art/dk_up_walk2.png").convert_alpha())
+        images.append(pygame.image.load("./art/dk_up_walk3.png").convert_alpha())
+        images.append(pygame.image.load("./art/dk_up_walk4.png").convert_alpha())
+    
+    elif direction == "down":
+        images.append(pygame.image.load("./art/dk_down_walk1.png").convert_alpha())
+        images.append(pygame.image.load("./art/dk_down_walk2.png").convert_alpha())
+        images.append(pygame.image.load("./art/dk_down_walk3.png").convert_alpha())
+        images.append(pygame.image.load("./art/dk_down_walk4.png").convert_alpha())
+
+    elif direction == "right":
+        images.append(pygame.image.load("./art/dk_right_walk1.png").convert_alpha())
+        images.append(pygame.image.load("./art/dk_right_walk2.png").convert_alpha())
+        images.append(pygame.image.load("./art/dk_right_walk3.png").convert_alpha())
+        images.append(pygame.image.load("./art/dk_right_walk4.png").convert_alpha())
+
+    elif direction == "left":
+        images.append(pygame.image.load("./art/dk_left_walk1.png").convert_alpha())
+        images.append(pygame.image.load("./art/dk_left_walk2.png").convert_alpha())
+        images.append(pygame.image.load("./art/dk_left_walk3.png").convert_alpha())
+        images.append(pygame.image.load("./art/dk_left_walk4.png").convert_alpha())
+    return images
+
+def walk_animation(direction, interval):
+    images = load_walk_animation(direction)
+    #if interval > len(images):
+    #    interval = 1
+
+    return images[interval]
+
+def get_standing_direction(direction):
+    if direction == "up":
+        image = pygame.image.load("./art/dk_up.png").convert_alpha()
+    elif direction == "down":
+        image = pygame.image.load("./art/dk_down.png").convert_alpha()
+    elif direction == "right":
+        image = pygame.image.load("./art/dk_right.png").convert_alpha()
+    elif direction == "left":
+        image = pygame.image.load("./art/dk_left.png").convert_alpha()
+    return image
+
 def main():
-    width = 1500
-    height = 900
+    screen_width = 1500
+    screen_height = 900
     blue_color = (97, 159, 182)
 
     character_x = 50
@@ -83,7 +124,7 @@ def main():
 
     pygame.mixer.music.load("./music/Angel's Fear.mp3")
 
-    screen = pygame.display.set_mode((width, height))
+    screen = pygame.display.set_mode((screen_width, screen_height))
     pygame.display.set_caption('Mana Dream -Secret of Mana Clone')
     intro_picture = pygame.image.load("./art/Mana Tree.jpg")
     intro_picture = pygame.transform.scale(intro_picture, (1500, 900))
@@ -95,8 +136,11 @@ def main():
 
     clock = pygame.time.Clock()
 
+    start_frame = time.time()
     # Game initialization
     interval = 0
+    character_facing = "down"
+    character_walk = False
     character_attack = False
     pygame.mixer.music.play(-1, 0.0)
     stop_game = False
@@ -123,30 +167,28 @@ def main():
         elif keys[pygame.K_UP]:
             character_y = character_y - 5
             character_facing = "up"
+            character_walk = True
 
         elif keys[pygame.K_DOWN]:
             character_y = character_y + 5
             character_facing = "down"
-            player_character_picture = character_picture
+            character_walk = True
+            #player_character_picture = character_picture
 
         elif keys[pygame.K_LEFT]:
             character_x = character_x - 5
             character_facing = "left"
+            character_walk = True
 
         elif keys[pygame.K_RIGHT]:
             character_x = character_x + 5
             character_facing = "right"
+            character_walk = True
 
         elif keys[pygame.K_SPACE]:
-            #global interval
             character_attack = True
-            #player_character_picture = attack_animation(character_facing, character_x, character_y, screen, interval)
-            #if interval > 8:
-            #    interval = 0
-            #else:
-            #    interval += 1
-            
-        
+
+
         for event in pygame.event.get():
 
             # Event handling
@@ -169,17 +211,37 @@ def main():
 
         # Draw background
         screen.blit(picture, (0, 0))
+        #screen.blit(picture, (-200, -300))
         if user_control:
-            screen.blit(player_character_picture, (character_x, character_y))
+            #screen.blit(player_character_picture, (character_x, character_y))
+            screen.blit(get_standing_direction(character_facing), (character_x, character_y))
         if character_attack:
-            interval = (interval + 1) % 10
-            print "interval %d " % interval
+            #interval = (interval + 1) % 10
+            #print "interval %d " % interval
+            noi = 10
+            frames_per_sec = 15
+            interval = int((time.time() - start_frame) * frames_per_sec % noi)
             screen.blit(attack_animation(character_facing, interval), (character_x, character_y))
             if interval >= 9:
                 interval = 0
                 character_attack = False
-        # Game display
 
+        if character_walk:
+            print "Character(x, y) (%d, %d)" % (character_x, character_y)
+            
+            #interval = (interval + 1) % 4
+            noi = 4
+            frames_per_sec = 10
+            interval = int((time.time() - start_frame) * frames_per_sec % noi)
+            screen.blit(walk_animation(character_facing, interval), (character_x, character_y))
+            if interval >= 3:
+                interval = 0
+                character_walk = False
+                screen.blit(get_standing_direction(character_facing), (character_x, character_y))
+        # Game display
+        if character_x >= 1400:
+            character_x = 50
+            screen.blit(picture, (character_x - screen_width, screen_height))
 
         pygame.display.update()
         clock.tick(60)
