@@ -34,16 +34,40 @@ def load_attack_animation(direction):
         images.append(pygame.image.load("./art/dk_up_attack9.png").convert_alpha())
         images.append(pygame.image.load("./art/dk_up_attack10.png").convert_alpha())
 
+    elif direction == "left":
+        images.append(pygame.image.load("./art/dk_left_attack1.png").convert_alpha())
+        images.append(pygame.image.load("./art/dk_left_attack2.png").convert_alpha())
+        images.append(pygame.image.load("./art/dk_left_attack3.png").convert_alpha())
+        images.append(pygame.image.load("./art/dk_left_attack4.png").convert_alpha())
+        images.append(pygame.image.load("./art/dk_left_attack5.png").convert_alpha())
+        images.append(pygame.image.load("./art/dk_left_attack6.png").convert_alpha())
+        images.append(pygame.image.load("./art/dk_left_attack7.png").convert_alpha())
+        images.append(pygame.image.load("./art/dk_left_attack8.png").convert_alpha())
+        images.append(pygame.image.load("./art/dk_left_attack9.png").convert_alpha())
+        images.append(pygame.image.load("./art/dk_left_attack10.png").convert_alpha())
+
+    elif direction == "right":
+        images.append(pygame.image.load("./art/dk_right_attack1.png").convert_alpha())
+        images.append(pygame.image.load("./art/dk_right_attack2.png").convert_alpha())
+        images.append(pygame.image.load("./art/dk_right_attack3.png").convert_alpha())
+        images.append(pygame.image.load("./art/dk_right_attack4.png").convert_alpha())
+        images.append(pygame.image.load("./art/dk_right_attack5.png").convert_alpha())
+        images.append(pygame.image.load("./art/dk_right_attack6.png").convert_alpha())
+        images.append(pygame.image.load("./art/dk_right_attack7.png").convert_alpha())
+        images.append(pygame.image.load("./art/dk_right_attack8.png").convert_alpha())
+        images.append(pygame.image.load("./art/dk_right_attack9.png").convert_alpha())
+        images.append(pygame.image.load("./art/dk_right_attack10.png").convert_alpha())
     return images
 
 def attack_animation(direction, interval):
+    print "direction :: %s" % direction
 
     images = load_attack_animation(direction)
 
     print "# of images %d" % (len(images))
     if interval > len(images):
         print images
-        interval = 0
+        interval = 1
     return images[interval]
 
 def main():
