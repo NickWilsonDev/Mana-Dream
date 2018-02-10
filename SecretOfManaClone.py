@@ -63,7 +63,8 @@ def main():
     pygame.mixer.init()
 
     pygame.mixer.music.load("./music/Angel's Fear.mp3")
-
+    
+    #screen = pygame.display.set_mode((screen_width, screen_height), pygame.FULLSCREEN)
     screen = pygame.display.set_mode((screen_width, screen_height))
     pygame.display.set_caption('Mana Dream -Secret of Mana Clone')
     intro_picture = pygame.image.load("./art/Mana Tree.jpg")
