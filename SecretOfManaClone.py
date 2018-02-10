@@ -1,5 +1,7 @@
 # SecretOfManaClone.py
 import pygame
+import time
+from itertools import cycle
 
 KEY_UP = 273
 KEY_DOWN = 274
@@ -7,13 +9,51 @@ KEY_LEFT = 276
 KEY_RIGHT = 275
 
 
-def attack_animation(direction):
-    pass
+def load_attack_animation(direction):
+    images = []
+    for i in range(1, 11):
+        images.append(pygame.image.load("./art/dk_%s_attack%d.png" % (direction, i)).convert_alpha())
+    return images
 
+def attack_animation(direction, interval):
+    """Function is called to help ensure the correct set of sprite images is 
+       drawn.
+       Params
+            direction - last direction the player character moved
+            interval  - will be index in list of attack animation images
+                        so the correct image will be chosen
+            Returns   - a particular image from the list of attack images
+    """
+    images = load_attack_animation(direction)
+    return images[interval]
+
+def load_walk_animation(direction):
+    images = []
+    for i in range(1, 5):
+        images.append(pygame.image.load("./art/dk_%s_walk%d.png" % (direction, i)).convert_alpha())
+    return images
+
+def walk_animation(direction, interval):
+    images = load_walk_animation(direction)
+    return images[interval]
+
+def get_standing_direction(direction):
+    image = pygame.image.load("./art/dk_%s.png" % direction).convert_alpha()
+    return image
+
+def display_menu(rotation):
+    # list = cycle(images) to cycle through circular list
+    images = []
+    magic_list = ['undine', 'shade', 'sylphid', 'salamando']
+    for element in magic_list:
+        images.append(pygame.image.load("./art/%s.png" % element).convert_alpha())
+
+    """ quick rotation of items if needed """
+    return images[-rotation % len(images):] + images[:-rotation % len(images)]
 
 def main():
-    width = 1500
-    height = 900
+    screen_width = 1500
+    screen_height = 900
     blue_color = (97, 159, 182)
 
     character_x = 50
@@ -24,7 +64,7 @@ def main():
 
     pygame.mixer.music.load("./music/Angel's Fear.mp3")
 
-    screen = pygame.display.set_mode((width, height))
+    screen = pygame.display.set_mode((screen_width, screen_height))
     pygame.display.set_caption('Mana Dream -Secret of Mana Clone')
     intro_picture = pygame.image.load("./art/Mana Tree.jpg")
     intro_picture = pygame.transform.scale(intro_picture, (1500, 900))
@@ -32,16 +72,27 @@ def main():
     user_control = False
     loading_screen = True
     character_facing = "down"
+    character_picture = ''
 
     clock = pygame.time.Clock()
-
+    
+    menu_index = 0
+    menu_rotating_right = False
+    start_frame = time.time()
+    background_x = 0
+    background_y = 0
     # Game initialization
-
+    interval = 0
+    character_facing = "down"
+    character_walk = False
+    character_attack = False
+    item_menu = False
     pygame.mixer.music.play(-1, 0.0)
     stop_game = False
     while not stop_game:
 
         keys = pygame.key.get_pressed()
+        
             # two keys pressed at the same time
         if keys[pygame.K_UP] and keys[pygame.K_LEFT]:
             character_y = character_y - 3
@@ -59,24 +110,28 @@ def main():
             character_y = character_y + 3
             character_x = character_x + 3
 
-        elif keys[pygame.K_UP]:
+        elif keys[pygame.K_UP] and not item_menu:
             character_y = character_y - 5
             character_facing = "up"
+            character_walk = True
 
-        elif keys[pygame.K_DOWN]:
+        elif keys[pygame.K_DOWN] and not item_menu:
             character_y = character_y + 5
             character_facing = "down"
+            character_walk = True
 
-        elif keys[pygame.K_LEFT]:
+        elif keys[pygame.K_LEFT] and not item_menu:
             character_x = character_x - 5
             character_facing = "left"
+            character_walk = True
 
-        elif keys[pygame.K_RIGHT]:
+        elif keys[pygame.K_RIGHT] and not item_menu:
             character_x = character_x + 5
             character_facing = "right"
+            character_walk = True
 
         elif keys[pygame.K_SPACE]:
-            attack_animation(character_facing)
+            character_attack = True
 
         for event in pygame.event.get():
 
@@ -90,21 +145,78 @@ def main():
                 user_control = True
                 pygame.mixer.music.load("./music/Prophecy.mp3")
                 pygame.mixer.music.play(-1, 0.0)
-                player_character_picture = pygame.image.load("./art/DarkKnight.png").convert_alpha()
+                player_character_picture = pygame.image.load("./art/dk_down.png").convert_alpha()
+                character_picture = player_character_picture
 
-            
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_i:
+                    menu_index = 0
+                    item_menu = not item_menu
+
+                elif event.key == pygame.K_RIGHT and item_menu:
+                    menu_index += 1
+                    menu_rotating_right = True
+                    print "menu moved %d" % menu_index
+                elif event.key == pygame.K_LEFT and item_menu:
+                    menu_index -= 1
+                    menu_rotating_left = True
+
             if event.type == pygame.QUIT:
                 stop_game = True
 
         # Game logic
 
         # Draw background
-        screen.blit(picture, (0, 0))
+        screen.blit(picture, (background_x, background_y))
         if user_control:
-            screen.blit(player_character_picture, (character_x, character_y))
-            pass
-        # Game display
+            screen.blit(get_standing_direction(character_facing), (character_x, character_y))
+        if character_attack:
+            noi = 10
+            frames_per_sec = 15
+            interval = int((time.time() - start_frame) * frames_per_sec % noi)
+            screen.blit(attack_animation(character_facing, interval), (character_x, character_y))
+            if interval >= 9:
+                interval = 0
+                character_attack = False
 
+        if character_walk:
+            print "Character(x, y) (%d, %d)" % (character_x, character_y)
+            noi = 4
+            frames_per_sec = 10
+            interval = int((time.time() - start_frame) * frames_per_sec % noi)
+            screen.blit(walk_animation(character_facing, interval), (character_x, character_y))
+            if interval >= 3:
+                interval = 0
+                character_walk = False
+                screen.blit(get_standing_direction(character_facing), (character_x, character_y))
+        if item_menu:
+            images = display_menu(menu_index)
+            screen.blit(images[0], (character_x, character_y - 150))
+            screen.blit(images[1], (character_x + 150, character_y))
+            screen.blit(images[2], (character_x, character_y + 150))
+            screen.blit(images[3], (character_x - 150, character_y))
+
+        if menu_rotating_right:
+            images = display_menu(menu_index)
+            noi = 4
+            frames_per_sec = 10
+            interval = int((time.time() - start_frame) * frames_per_sec % noi)
+            #screen.blit(images[0], (character_x, character_y))
+            
+        # Game display
+        if character_x >= 1300:
+            background_x = background_x - character_x
+            character_x = 50
+        if character_y >= 800:
+            background_y = background_y - character_y
+            character_y = 50
+
+        if character_x < 10:
+            background_x = background_x + 1400
+            character_x = 50
+        if character_y < 10:
+            background_y = background_y + 900
+            character_y = 50
 
         pygame.display.update()
         clock.tick(60)
