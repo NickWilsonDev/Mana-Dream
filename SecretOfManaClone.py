@@ -168,7 +168,8 @@ def main():
 
         # Draw background
         screen.blit(picture, (background_x, background_y))
-        if user_control:
+        if user_control and not character_walk and not character_attack:
+            
             screen.blit(get_standing_direction(character_facing), (character_x, character_y))
         if character_attack:
             noi = 10
