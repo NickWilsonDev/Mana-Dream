@@ -10,6 +10,14 @@ KEY_LEFT = 276
 KEY_RIGHT = 275
 
 
+magic_list = ['undine', 'salamando', 'shade', 'sylphid']
+magic_dict = {
+    'undine': 'water',
+    'salamando': 'fire',
+    'shade': 'darkness',
+    'sylphid': 'lightning'
+}
+
 def load_attack_images(direction):
     images = []
     for i in range(1, 11):
@@ -30,13 +38,14 @@ def attack_animation(direction, interval):
 
 def load_magic_images(magic_type):
     images = []
-    for i in range(1, 6):
+    for i in range(1, 14):
         images.append(pygame.image.load("./art/%s%d.png" % (magic_type, i)).convert_alpha())
     return images
 
 def magic_animation(magic_type, interval):
     images = []
-    images = load_magic_images(magic_type)
+    magic = magic_dict[magic_type]
+    images = load_magic_images(magic)
     return images[interval]
 
 def load_walk_images(direction):
@@ -54,9 +63,10 @@ def get_standing_direction(direction):
     return image
 
 def display_menu(rotation):
+    print "rotation:: %d" % rotation
     # list = cycle(images) to cycle through circular list
     images = []
-    magic_list = ['undine', 'shade', 'sylphid', 'salamando']
+    #magic_list = ['undine', 'shade', 'sylphid', 'salamando']
     for element in magic_list:
         images.append(pygame.image.load("./art/%s.png" % element).convert_alpha())
 
@@ -66,7 +76,6 @@ def display_menu(rotation):
 def main():
     screen_width = 1500
     screen_height = 900
-    blue_color = (97, 159, 182)
 
     character_x = 50
     character_y = 50
@@ -98,7 +107,6 @@ def main():
     background_y = 0
     # Game initialization
     interval = 0
-    character_facing = "down"
     character_walk = False
     character_attack = False
     item_menu = False
@@ -182,6 +190,7 @@ def main():
                     menu_rotating_left = True
                 elif event.key == pygame.K_SPACE and item_menu:
                     menu_select = True
+                    print menu_index
 
             if event.type == pygame.QUIT:
                 stop_game = True
@@ -213,6 +222,7 @@ def main():
                 screen.blit(get_standing_direction(character_facing), (character_x, character_y))
         if item_menu:
             images = display_menu(menu_index)
+            print images
             # maybe instead of just displaying them we will set their inital positions
             if not menu_rotating_right:
                 screen.blit(images[0], (character_x, character_y - 150))
@@ -221,13 +231,15 @@ def main():
                 screen.blit(images[3], (character_x - 150, character_y))
             
             if  menu_select:
-                print start_frame
-                noi = 5
+                #print start_frame
+                noi = 13
                 frames_per_sec = 5
                 interval = int((time.time() - start_frame) * frames_per_sec % noi)
                 #may change character coordinates to target coordinates later
-                screen.blit(magic_animation('lightning', interval), (character_x, character_y))
-                if interval >= 4:
+                print magic_list
+                print magic_list[menu_index]
+                screen.blit(magic_animation(magic_list[menu_index], interval), (character_x, character_y))
+                if interval >= 12:
                     interval = 0
                     menu_select = False
                     item_menu = False
