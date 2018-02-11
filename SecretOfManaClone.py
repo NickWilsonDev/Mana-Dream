@@ -28,6 +28,17 @@ def attack_animation(direction, interval):
     images = load_attack_images(direction)
     return images[interval]
 
+def load_magic_images(magic_type):
+    images = []
+    for i in range(1, 6):
+        images.append(pygame.image.load("./art/%s%d.png" % (magic_type, i)).convert_alpha())
+    return images
+
+def magic_animation(magic_type, interval):
+    images = []
+    images = load_magic_images(magic_type)
+    return images[interval]
+
 def load_walk_images(direction):
     images = []
     for i in range(1, 5):
@@ -77,7 +88,7 @@ def main():
     character_picture = ''
 
     clock = pygame.time.Clock()
-    
+    menu_select = ''
     menu_index = 0
     menu_rotating_right = False
     menu_item_position_x = 0
@@ -137,7 +148,7 @@ def main():
         elif keys[pygame.K_RIGHT] and item_menu:
             menu_rotating_right = True #not menu_rotating_right
 
-        elif keys[pygame.K_SPACE]:
+        elif keys[pygame.K_SPACE] and not item_menu:
             character_attack = True
 
         for event in pygame.event.get():
@@ -169,6 +180,8 @@ def main():
                 elif event.key == pygame.K_LEFT and item_menu:
                     menu_index -= 1
                     menu_rotating_left = True
+                elif event.key == pygame.K_SPACE and item_menu:
+                    menu_select = True
 
             if event.type == pygame.QUIT:
                 stop_game = True
@@ -178,7 +191,6 @@ def main():
         # Draw background
         screen.blit(picture, (background_x, background_y))
         if user_control and not character_walk and not character_attack:
-            
             screen.blit(get_standing_direction(character_facing), (character_x, character_y))
         if character_attack:
             noi = 10
@@ -190,7 +202,7 @@ def main():
                 character_attack = False
 
         if character_walk:
-            print "Character(x, y) (%d, %d)" % (character_x, character_y)
+            #print "Character(x, y) (%d, %d)" % (character_x, character_y)
             noi = 4
             frames_per_sec = 10
             interval = int((time.time() - start_frame) * frames_per_sec % noi)
@@ -202,19 +214,29 @@ def main():
         if item_menu:
             images = display_menu(menu_index)
             # maybe instead of just displaying them we will set their inital positions
-            screen.blit(images[0], (character_x, character_y - 150))
-            screen.blit(images[1], (character_x + 150, character_y))
-            screen.blit(images[2], (character_x, character_y + 150))
-            screen.blit(images[3], (character_x - 150, character_y))
+            if not menu_rotating_right:
+                screen.blit(images[0], (character_x, character_y - 150))
+                screen.blit(images[1], (character_x + 150, character_y))
+                screen.blit(images[2], (character_x, character_y + 150))
+                screen.blit(images[3], (character_x - 150, character_y))
+            
+            if  menu_select:
+                print start_frame
+                noi = 5
+                frames_per_sec = 5
+                interval = int((time.time() - start_frame) * frames_per_sec % noi)
+                #may change character coordinates to target coordinates later
+                screen.blit(magic_animation('lightning', interval), (character_x, character_y))
+                if interval >= 4:
+                    interval = 0
+                    menu_select = False
+                    item_menu = False
 
-            #screen.blit(images[0], (menu_item_position_x, menu_item_position_y))
             if menu_rotating_right:
                 # increment by 15 degrees?
-                # cos 360 (
                 two_pi = 2 * math.pi
                 fifteen_degrees = math.pi / 12
                 i = 1
-                #clock.tick(400)
                 while i < 7:
                     temp = two_pi - (i * (fifteen_degrees))
                     temp2 = two_pi + (i * (fifteen_degrees))
@@ -224,16 +246,13 @@ def main():
                     
                     menu_item2_position_x = character_x + int(math.cos(temp2) * 150)
                     menu_item2_position_y = character_y + int(math.sin(temp2) * 150)
-                    
 
                     menu_item3_position_x = character_x - int(math.cos(temp3) * 150)
                     menu_item3_position_y = character_y - int(math.sin(temp3) * 150)
 
-
                     menu_item0_position_x = character_x - int(math.cos(temp) * 150)
                     menu_item0_position_y = character_y + int(math.sin(temp) * 150)
-                    print "item position x %d" % menu_item_position_x
-                    #clock.tick(400)
+                   # print "item position x %d" % menu_item_position_x
                     
                     screen.blit(images[1], (menu_item_position_x, menu_item_position_y))
                     screen.blit(images[2], (menu_item2_position_x, menu_item2_position_y))
@@ -243,13 +262,6 @@ def main():
                     i += 1
                 menu_rotating_right = False
 
-            #images = display_menu(menu_index)
-            #noi = 4
-            #frames_per_sec = 10
-            #interval = int((time.time() - start_frame) * frames_per_sec % noi)
-            
-            #screen.blit(images[0], (character_x, character_y))
-            
         # Game display background world map ect
         if character_x >= 1300:
             background_x = background_x - character_x
