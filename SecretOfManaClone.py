@@ -251,7 +251,7 @@ def main():
                 two_pi = 2 * math.pi
                 fifteen_degrees = math.pi / 12
                 i = 1
-                while i < 7:
+                while i < 7: # 6 is good for 90 degrees, with 4 menu options
                     temp = two_pi - (i * (fifteen_degrees))
                     temp2 = two_pi + (i * (fifteen_degrees))
                     temp3 = two_pi - (i * fifteen_degrees)
