@@ -2,6 +2,7 @@
 import pygame
 import time
 from itertools import cycle
+import math
 
 KEY_UP = 273
 KEY_DOWN = 274
@@ -9,7 +10,7 @@ KEY_LEFT = 276
 KEY_RIGHT = 275
 
 
-def load_attack_animation(direction):
+def load_attack_images(direction):
     images = []
     for i in range(1, 11):
         images.append(pygame.image.load("./art/dk_%s_attack%d.png" % (direction, i)).convert_alpha())
@@ -24,17 +25,17 @@ def attack_animation(direction, interval):
                         so the correct image will be chosen
             Returns   - a particular image from the list of attack images
     """
-    images = load_attack_animation(direction)
+    images = load_attack_images(direction)
     return images[interval]
 
-def load_walk_animation(direction):
+def load_walk_images(direction):
     images = []
     for i in range(1, 5):
         images.append(pygame.image.load("./art/dk_%s_walk%d.png" % (direction, i)).convert_alpha())
     return images
 
 def walk_animation(direction, interval):
-    images = load_walk_animation(direction)
+    images = load_walk_images(direction)
     return images[interval]
 
 def get_standing_direction(direction):
@@ -79,6 +80,8 @@ def main():
     
     menu_index = 0
     menu_rotating_right = False
+    menu_item_position_x = 0
+    menu_item_position_y = 0
     start_frame = time.time()
     background_x = 0
     background_y = 0
@@ -131,6 +134,9 @@ def main():
             character_facing = "right"
             character_walk = True
 
+        elif keys[pygame.K_RIGHT] and item_menu:
+            menu_rotating_right = True #not menu_rotating_right
+
         elif keys[pygame.K_SPACE]:
             character_attack = True
 
@@ -156,7 +162,9 @@ def main():
 
                 elif event.key == pygame.K_RIGHT and item_menu:
                     menu_index += 1
+                    #while event.key != pygame.KEYUP:
                     menu_rotating_right = True
+                    #menu_rotating_right = False
                     print "menu moved %d" % menu_index
                 elif event.key == pygame.K_LEFT and item_menu:
                     menu_index -= 1
@@ -193,19 +201,56 @@ def main():
                 screen.blit(get_standing_direction(character_facing), (character_x, character_y))
         if item_menu:
             images = display_menu(menu_index)
+            # maybe instead of just displaying them we will set their inital positions
             screen.blit(images[0], (character_x, character_y - 150))
             screen.blit(images[1], (character_x + 150, character_y))
             screen.blit(images[2], (character_x, character_y + 150))
             screen.blit(images[3], (character_x - 150, character_y))
 
-        if menu_rotating_right:
-            images = display_menu(menu_index)
-            noi = 4
-            frames_per_sec = 10
-            interval = int((time.time() - start_frame) * frames_per_sec % noi)
+            #screen.blit(images[0], (menu_item_position_x, menu_item_position_y))
+            if menu_rotating_right:
+                # increment by 15 degrees?
+                # cos 360 (
+                two_pi = 2 * math.pi
+                fifteen_degrees = math.pi / 12
+                i = 1
+                #clock.tick(400)
+                while i < 7:
+                    temp = two_pi - (i * (fifteen_degrees))
+                    temp2 = two_pi + (i * (fifteen_degrees))
+                    temp3 = two_pi - (i * fifteen_degrees)
+                    menu_item_position_x = character_x + int(math.cos(temp) * 150)
+                    menu_item_position_y = character_y + int(math.sin(temp) * 150)
+                    
+                    menu_item2_position_x = character_x + int(math.cos(temp2) * 150)
+                    menu_item2_position_y = character_y + int(math.sin(temp2) * 150)
+                    
+
+                    menu_item3_position_x = character_x - int(math.cos(temp3) * 150)
+                    menu_item3_position_y = character_y - int(math.sin(temp3) * 150)
+
+
+                    menu_item0_position_x = character_x - int(math.cos(temp) * 150)
+                    menu_item0_position_y = character_y + int(math.sin(temp) * 150)
+                    print "item position x %d" % menu_item_position_x
+                    #clock.tick(400)
+                    
+                    screen.blit(images[1], (menu_item_position_x, menu_item_position_y))
+                    screen.blit(images[2], (menu_item2_position_x, menu_item2_position_y))
+                    
+                    screen.blit(images[3], (menu_item3_position_x, menu_item3_position_y))
+                    screen.blit(images[0], (menu_item0_position_x, menu_item0_position_y))
+                    i += 1
+                menu_rotating_right = False
+
+            #images = display_menu(menu_index)
+            #noi = 4
+            #frames_per_sec = 10
+            #interval = int((time.time() - start_frame) * frames_per_sec % noi)
+            
             #screen.blit(images[0], (character_x, character_y))
             
-        # Game display
+        # Game display background world map ect
         if character_x >= 1300:
             background_x = background_x - character_x
             character_x = 50
