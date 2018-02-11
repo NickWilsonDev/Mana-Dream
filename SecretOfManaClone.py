@@ -180,17 +180,19 @@ def main():
                     item_menu = not item_menu
 
                 elif event.key == pygame.K_RIGHT and item_menu:
-                    menu_index += 1
+                    menu_index = (menu_index + 1) % 4 # need this to be size of menu
                     #while event.key != pygame.KEYUP:
                     menu_rotating_right = True
                     #menu_rotating_right = False
                     print "menu moved %d" % menu_index
                 elif event.key == pygame.K_LEFT and item_menu:
-                    menu_index -= 1
+                    menu_index = (menu_index - 1) % 4
                     menu_rotating_left = True
                 elif event.key == pygame.K_SPACE and item_menu:
                     menu_select = True
                     print menu_index
+                elif event.key == pygame.K_ESCAPE:
+                    stop_game = True
 
             if event.type == pygame.QUIT:
                 stop_game = True
