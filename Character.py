@@ -1,6 +1,8 @@
 #Character.py
 """This class will model the player character in the Mana-Dream game."""
 
+import pygame
+
 class Character(object):
 
     def __init__(self):
@@ -38,3 +40,27 @@ class Character(object):
 
     def take_damage(self):
         pass
+
+
+    def display_menu(self, rotation):
+        print "rotation:: %d" % rotation
+        images = []
+        for element in self.magic_list:
+            images.append(pygame.image.load("./art/%s.png" % element).convert_alpha())
+
+        """ quick rotation of items if needed """
+        return images[-rotation % len(images):] + images[:-rotation % len(images)]
+
+
+    def load_magic_images(self, magic_type):
+        images = []
+        for i in range(1, 14):
+            images.append(pygame.image.load("./art/%s%d.png" % (magic_type, i)).convert_alpha())
+        return images
+
+    def magic_animation(self, magic_type, interval):
+        images = []
+        magic = self.magic_dict[magic_type]
+        images = self.load_magic_images(magic)
+        return images[interval]
+
