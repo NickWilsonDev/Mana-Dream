@@ -64,3 +64,31 @@ class Character(object):
         images = self.load_magic_images(magic)
         return images[interval]
 
+    def load_attack_images(self, direction):
+        images = []
+        for i in range(1, 11):
+            images.append(pygame.image.load("./art/dk_%s_attack%d.png" % (direction, i)).convert_alpha())
+        return images
+
+    def attack_animation(self, direction, interval):
+        """Function is called to help ensure the correct set of sprite images is 
+        drawn.
+        Params
+            direction - last direction the player character moved
+            interval  - will be index in list of attack animation images
+                        so the correct image will be chosen
+            Returns   - a particular image from the list of attack images
+        """
+        images = self.load_attack_images(direction)
+        return images[interval]
+
+    def load_walk_images(self, direction):
+        images = []
+        for i in range(1, 5):
+            images.append(pygame.image.load("./art/dk_%s_walk%d.png" % (direction, i)).convert_alpha())
+        return images
+
+    def walk_animation(self, direction, interval):
+        images = self.load_walk_images(direction)
+        return images[interval]
+

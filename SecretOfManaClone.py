@@ -6,33 +6,6 @@ import math
 from  Character import Character
 
 
-def load_attack_images(direction):
-    images = []
-    for i in range(1, 11):
-        images.append(pygame.image.load("./art/dk_%s_attack%d.png" % (direction, i)).convert_alpha())
-    return images
-
-def attack_animation(direction, interval):
-    """Function is called to help ensure the correct set of sprite images is 
-       drawn.
-       Params
-            direction - last direction the player character moved
-            interval  - will be index in list of attack animation images
-                        so the correct image will be chosen
-            Returns   - a particular image from the list of attack images
-    """
-    images = load_attack_images(direction)
-    return images[interval]
-
-def load_walk_images(direction):
-    images = []
-    for i in range(1, 5):
-        images.append(pygame.image.load("./art/dk_%s_walk%d.png" % (direction, i)).convert_alpha())
-    return images
-
-def walk_animation(direction, interval):
-    images = load_walk_images(direction)
-    return images[interval]
 
 def get_standing_direction(direction):
     image = pygame.image.load("./art/dk_%s.png" % direction).convert_alpha()
@@ -170,7 +143,7 @@ def main():
             noi = 10
             frames_per_sec = 15
             interval = int((time.time() - start_frame) * frames_per_sec % noi)
-            screen.blit(attack_animation(character_facing, interval), (character.character_x, character.character_y))
+            screen.blit(character.attack_animation(character_facing, interval), (character.character_x, character.character_y))
             if interval >= 9:
                 interval = 0
                 character_attack = False
@@ -180,7 +153,7 @@ def main():
             noi = 4
             frames_per_sec = 10
             interval = int((time.time() - start_frame) * frames_per_sec % noi)
-            screen.blit(walk_animation(character_facing, interval), (character.character_x, character.character_y))
+            screen.blit(character.walk_animation(character_facing, interval), (character.character_x, character.character_y))
             if interval >= 3:
                 interval = 0
                 character_walk = False
