@@ -16,7 +16,7 @@ class Character(object):
         self.current_mp = self.max_mp
         self.attack = 5
         self.defense = 5
-        self.magic_list = ['undine', 'salamando', 'shade', 'sylphid']
+        self.magic_list = ['undine', 'sylphid', 'shade', 'salamando']
         self.magic_dict = {
             'undine': 'water',
             'salamando': 'fire',

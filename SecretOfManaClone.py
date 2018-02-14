@@ -78,12 +78,12 @@ def main():
     while not stop_game:
 
         keys = pygame.key.get_pressed()
-        
-            # two keys pressed at the same time
+
+        # two keys pressed at the same time
         if keys[pygame.K_UP] and keys[pygame.K_LEFT]:
             character.character_y = character.character_y - 3
             character.character_x = character.character_x - 3
-            
+
         elif keys[pygame.K_UP] and keys[pygame.K_RIGHT]:
             character.character_y = character.character_y - 3
             character.character_x = character.character_x + 3
@@ -202,6 +202,7 @@ def main():
                 interval = int((time.time() - start_frame) * frames_per_sec % noi)
                 #may change character coordinates to target coordinates later
                 print character.magic_list
+                print "---------------------below is selected magic ----------"
                 print character.magic_list[menu_index]
                 screen.blit(character.magic_animation(character.magic_list[menu_index], interval), (character.character_x, character.character_y))
                 if interval >= 12:
@@ -216,24 +217,21 @@ def main():
                 i = 1
                 while i < 7: # 6 is good for 90 degrees, with 4 menu options
                     temp = two_pi - (i * (fifteen_degrees))
-                    temp2 = two_pi + (i * (fifteen_degrees))
-                    temp3 = two_pi - (i * fifteen_degrees)
                     menu_item_position_x = character.character_x + int(math.cos(temp) * 150)
                     menu_item_position_y = character.character_y + int(math.sin(temp) * 150)
-                    
-                    menu_item2_position_x = character.character_x + int(math.cos(temp2) * 150)
-                    menu_item2_position_y = character.character_y + int(math.sin(temp2) * 150)
 
-                    menu_item3_position_x = character.character_x - int(math.cos(temp3) * 150)
-                    menu_item3_position_y = character.character_y - int(math.sin(temp3) * 150)
+                    menu_item2_position_x = character.character_x + int(math.cos(temp) * 150)
+                    menu_item2_position_y = character.character_y - int(math.sin(temp) * 150)
+
+                    menu_item3_position_x = character.character_x - int(math.cos(temp) * 150)
+                    menu_item3_position_y = character.character_y - int(math.sin(temp) * 150)
 
                     menu_item0_position_x = character.character_x - int(math.cos(temp) * 150)
                     menu_item0_position_y = character.character_y + int(math.sin(temp) * 150)
-                   # print "item position x %d" % menu_item_position_x
-                    
+
+                    #write images
                     screen.blit(images[1], (menu_item_position_x, menu_item_position_y))
                     screen.blit(images[2], (menu_item2_position_x, menu_item2_position_y))
-                    
                     screen.blit(images[3], (menu_item3_position_x, menu_item3_position_y))
                     screen.blit(images[0], (menu_item0_position_x, menu_item0_position_y))
                     i += 1
